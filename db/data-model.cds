@@ -15,13 +15,15 @@ entity Building : cuid, managed {
 
 aspect BuildingEmission {
     key emission : Association to one Emission;
+    unit : type of emission.unit;
+    multiplicator : Integer;
     value : Decimal;
-    unit : String;
 }
 
 entity Emission : managed {
     key name : String;
     key level : Integer;
+    description : String;
     value : Decimal;
     unit : String;
 }

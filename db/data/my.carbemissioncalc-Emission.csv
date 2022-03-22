@@ -1,0 +1,6 @@
+name;level;description;value;unit;
+heating;1;Wood Pellets;5.472;kg/sqm;
+heating;2;Biogas;23.104;kg/sqm;
+heating;3;Natural Gas;30.552;kg/sqm;
+heating;4;Oil;34.352;kg/sqm;
+heating;5;Brown Coal;58.216;kg/sqm;
