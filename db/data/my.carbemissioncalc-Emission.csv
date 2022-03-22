@@ -1,6 +1,10 @@
 name;level;description;value;unit;
-heating;1;Wood Pellets;5.472;kg/sqm;
-heating;2;Biogas;23.104;kg/sqm;
-heating;3;Natural Gas;30.552;kg/sqm;
-heating;4;Oil;34.352;kg/sqm;
-heating;5;Brown Coal;58.216;kg/sqm;
+heating;1;Wood Pellets;5.472;kg/sqm/y;
+heating;2;Biogas;23.104;kg/sqm/y;
+heating;3;Natural Gas;30.552;kg/sqm/y;
+heating;4;Oil;34.352;kg/sqm/y;
+heating;5;Brown Coal;58.216;kg/sqm/y;
+hotwater;1;Gas;277140;kg/y;
+hotwater;2;Electric;897450;kg/y;
+electricity;1;green;40;kg/y;
+electricity;2;standart;612.3;kg/y;
