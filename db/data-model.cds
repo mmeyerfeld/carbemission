@@ -3,15 +3,13 @@ using { cuid } from '@sap/cds/common';
 using { managed } from '@sap/cds/common';
 
 
-entity Building : cuid, managed {
+entity Building : cuid {
     emissions : Composition of many BuildingEmission;
 }
 
 aspect BuildingEmission {
     key emission : Association to one Emission;
-    unit : type of emission.unit;
     multiplicator : Integer;
-    value : Decimal;
 }
 
 entity Emission : managed {
