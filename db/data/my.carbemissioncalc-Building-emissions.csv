@@ -1,3 +1,5 @@
 up__ID;emission_name;emission_level;multiplicator;
 Kekse;heating;1;2;
 Kekse;heating;2;1;
+Joghurt;heating;1;56;
+Joghurt:heating;2;6;
