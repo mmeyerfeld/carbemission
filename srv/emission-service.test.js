@@ -3,44 +3,68 @@ const cds = require('@sap/cds-dk/lib');
 const { GET, POST, data } = cds.test(__dirname+'/..');
 const testData = data;
 
-describe('CDS Testing', ()=>{
-    beforeAll(async ()=> { 
-        testData.delete();
-        setupEmissions();
-        const db = await cds.connect.to('db');
-        const {Building} = db.model.entities('my.carbemissioncalc');
-        await db.create(Building).entries([
-            {emissions : [
-                {emission_name : "heating", emission_level : 1}
-            ]}
-        ]);
-    });
-    
-    afterEach(async ()=> {
-        await testData.reset();
+describe('CDS Testing', ()=> {
+    describe ('Tests without Data', ()=> {
+        beforeAll(async ()=> {
+            await testData.delete();
+        })
+        test ('Returning []', async ()=>{
+            const { data } = await GET `/emission/Buildings`;
+            expect(data.value).toEqual([]);
+        });
     });
 
-    test ('With Mock-Data', async ()=>{
-        const { data } = await GET `/emission/Buildings`;
-    
-        expect(data.value).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining({ ID: expect.any(String)})
-            ])
-        );
+    describe ('Tests with one Dataset', ()=> {
+        beforeAll(async ()=> {
+            await testData.delete();
+            setupEmissions();
+            setupSingleBuilding();
+        });
+
+        test ('Sum()', async ()=> {
+            const { data } = await GET `/emission/Buildings`;
+            expect(data.value).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        ID: expect.any(String),
+                        totalEmission : 278080.62,
+                        unit : expect.any(String)
+                    })
+                ])
+            );
+        });
     });
 
-    test ('Without Mock-Data', async ()=> {
-        const { data } = await GET `/emission/Buildings`;
-    
-        expect(data.value).toEqual(
-            expect.not.arrayContaining([
-                expect.objectContaining({ ID: "KeinJoghurt"})
-            ])
-        );
+    describe ('Tests with many Datasets', ()=> {
+        beforeAll(async ()=> {
+            await testData.delete();
+            setupEmissions();
+            setupBuildings();
+        });
+
+        test (`Working with 'GroupBy'`, async ()=> {
+            const { data } = await GET `/emission/Buildings`;
+        
+            expect(data.value).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        ID: expect.any(String),
+                        totalEmission : 278080.62,
+                        unit : expect.any(String)
+                    })
+                ])
+            );
+            expect(data.value).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        ID: expect.any(String),
+                        totalEmission : 902378.32,
+                        unit : expect.any(String)
+                    })
+                ])
+            );
+        });
     });
-
-
 });
 
 // describe('Methode Testing', ()=>{
@@ -65,4 +89,35 @@ async function setupEmissions() {
         {name : "electricity", level : 1, description : "green", value : 40, unit : "kg/y"},
         {name : "electricity", level : 2, description : "standart", value : 612.3, unit : "kg/y"}
     ]);
+}
+
+async function setupSingleBuilding() {
+    createEntries([
+        {emissions : [
+            {emission_name : "heating", emission_level : 1, multiplicator : 60},
+            {emission_name : "hotwater", emission_level : 1},
+            {emission_name : "electricity", emission_level : 2}
+        ]}
+    ]);
+}
+
+async function setupBuildings() {
+    createEntries([
+        {emissions : [
+            {emission_name : "heating", emission_level : 1, multiplicator : 60},
+            {emission_name : "hotwater", emission_level : 1},
+            {emission_name : "electricity", emission_level : 2}
+        ]},
+        {emissions : [
+            {emission_name : "heating", emission_level : 3, multiplicator : 160},
+            {emission_name : "hotwater", emission_level : 2},
+            {emission_name : "electricity", emission_level : 1}
+        ]}
+    ]);  
+}
+
+async function createEntries(entries) {
+    const db = await cds.connect.to('db');
+    const {Building} = db.model.entities('my.carbemissioncalc');
+    await db.create(Building).entries(entries);
 }
