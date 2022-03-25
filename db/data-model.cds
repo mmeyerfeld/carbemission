@@ -9,7 +9,7 @@ entity Building : cuid {
 
 aspect BuildingEmission {
     key emission : Association to one Emission;
-    multiplicator : Integer;
+    multiplicator : Integer default 1;
 }
 
 entity Emission : managed {
