@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Capabilities.V1.xml">
+        <edmx:Include Alias="Capabilities" Namespace="Org.OData.Capabilities.V1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="EmissionService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="Buildings" EntityType="EmissionService.Buildings"/>
+                <EntitySet Name="Emissions" EntityType="EmissionService.Emissions">
+                    <NavigationPropertyBinding Path="up_" Target="Buildings"/>
+                </EntitySet>
+            </EntityContainer>
+            <EntityType Name="Buildings">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="totalEmission" Type="Edm.Decimal" Scale="variable"/>
+                <Property Name="unit" Type="Edm.String"/>
+            </EntityType>
+            <EntityType Name="Emissions">
+                <NavigationProperty Name="up_" Type="EmissionService.Buildings" Nullable="false">
+                    <ReferentialConstraint Property="up__ID" ReferencedProperty="ID"/>
+                </NavigationProperty>
+                <Property Name="up__ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="name" Type="Edm.String"/>
+                <Property Name="level" Type="Edm.Int32"/>
+                <Property Name="multiplicator" Type="Edm.Int32" DefaultValue="1"/>
+            </EntityType>
+            <Function Name="getBuildingEmission" IsBound="true" IsComposable="false" EntitySetPath="in">
+                <Parameter Name="in" Type="EmissionService.Buildings"/>
+                <ReturnType Type="EmissionService.Buildings"/>
+            </Function>
+            <Action Name="insertNewBuilding" IsBound="true">
+                <Parameter Name="in" Type="EmissionService.Emissions"/>
+                <Parameter Name="emissions" Type="Collection(EmissionService.Emissions)" Nullable="false"/>
+                <ReturnType Type="Edm.Guid"/>
+            </Action>
+            <Annotations Target="EmissionService.Buildings">
+                <Annotation Term="Capabilities.DeleteRestrictions">
+                    <Record Type="Capabilities.DeleteRestrictionsType">
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.InsertRestrictions">
+                    <Record Type="Capabilities.InsertRestrictionsType">
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.UpdateRestrictions">
+                    <Record Type="Capabilities.UpdateRestrictionsType">
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="EmissionService.EntityContainer/Buildings">
+                <Annotation Term="Capabilities.DeleteRestrictions">
+                    <Record Type="Capabilities.DeleteRestrictionsType">
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.InsertRestrictions">
+                    <Record Type="Capabilities.InsertRestrictionsType">
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.UpdateRestrictions">
+                    <Record Type="Capabilities.UpdateRestrictionsType">
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="EmissionService.Buildings/totalEmission">
+                <Annotation Term="Core.Computed" Bool="true"/>
+            </Annotations>
+            <Annotations Target="EmissionService.Buildings/unit">
+                <Annotation Term="Core.Computed" Bool="true"/>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
