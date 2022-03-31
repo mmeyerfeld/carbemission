@@ -5,8 +5,8 @@ class EmissionService extends cds.ApplicationService {
         this.on ('insertNewBuilding', async (req) => {
             const db = await cds.connect.to('db');
             const {Building} = await db.model.entities('my.carbemissioncalc');
-            let ID = await db.create('Building', req.data);
-            return ID.results[0].values[0];
+            await db.create(Building, req.data);
+            return req.data.ID;
         });
         this.on ('getBuildingEmission', 'Buildings', async (req)=> {
             let building = await this.read(`Buildings`).where({ID:req.data.ID});
@@ -16,12 +16,7 @@ class EmissionService extends cds.ApplicationService {
     }
 }
 
-function insertNewBuilding(req) {
-    console.log("Von insertNewBuilding: " + req.data);
-    return req.data;
-}
 
 module.exports = {
-    EmissionService,
-    insertNewBuilding
+    EmissionService
 };

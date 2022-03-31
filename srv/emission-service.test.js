@@ -108,6 +108,31 @@ describe('CDS Testing', ()=> {
     });
 });
 
+describe ('Integration Testing', ()=> {
+    beforeAll(async ()=> {
+        await testData.delete();
+        setupEmissions();
+    }); 
+    test (`Simple Integration Test`, async ()=> {
+        expect.assertions(1);
+        const srv = await cds.connect.to('EmissionService');
+        const ID = await srv.insertNewBuilding([
+            {emission_name : 'heating', emission_level : 2, multiplicator : 600},
+            {emission_name : 'hotwater', emission_level : 1},
+            {emission_name : 'electricity', emission_level : 2}
+        ]);
+        await expect(await srv.getBuildingEmission('Buildings', ID)).toEqual(
+            expect.arrayContaining([
+                {
+                    "ID": ID,
+                    "totalEmission": 291614.7,
+                    "unit": "kg/y"
+                }
+            ])
+        );
+    });
+});
+
 // describe('Methode Testing', ()=>{
 //     beforeAll(()=>{});
 //     test('adds 1 + 2 to equal 3', () => {
