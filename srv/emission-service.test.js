@@ -4,47 +4,26 @@ const { GET, POST, data } = cds.test(__dirname+'/..');
 const testData = data;
 
 describe('CDS Testing', ()=> {
+    beforeAll(async ()=> {
+        await testData.delete();
+    });
+
     describe ('Tests without Data', ()=> {
-        beforeAll(async ()=> {
-            await testData.delete();
-        })
         test ('Returning []', async ()=>{
             const { data } = await GET `/emission/Buildings`;
             expect(data.value).toEqual([]);
         });
     });
 
-    describe ('Tests with one Dataset', ()=> {
-        beforeAll(async ()=> {
-            await testData.delete();
-            setupEmissions();
-            setupSingleBuilding();
-        });
-
-        test ('Sum()', async ()=> {
-            const { data } = await GET `/emission/Buildings`;
-            expect(data.value).toEqual(
-                expect.arrayContaining([
-                    expect.objectContaining({
-                        ID: expect.any(String),
-                        totalEmission : 278080.62,
-                        unit : expect.any(String)
-                    })
-                ])
-            );
-        });
-    });
-
-    describe ('Tests with many Datasets', ()=> {
+    describe ('Tests with Datasets', ()=> {
         beforeAll(async ()=> {
             await testData.delete();
             setupEmissions();
             setupBuildings();
         });
-
-        test (`Working with 'GroupBy'`, async ()=> {
+         
+        test (`Testing totalEmission`, async ()=> {
             const { data } = await GET `/emission/Buildings`;
-        
             expect(data.value).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
@@ -64,6 +43,68 @@ describe('CDS Testing', ()=> {
                 ])
             );
         });
+
+        test (`Testing unit`, async ()=> {
+            const { data } = await GET `/emission/Buildings`;
+            expect(data.value).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        ID: expect.any(String),
+                        totalEmission : expect.any(Number),
+                        unit : 'kg/y'
+                    })
+                ])
+            );
+            expect(data.value).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        ID: expect.any(String),
+                        totalEmission : expect.any(Number),
+                        unit : 'kg/y'
+                    })
+                ])
+            );
+        });
+    });
+
+    describe ('Testing POST', ()=> {
+        test (`POST Buildings`, async ()=> {
+            expect.assertions(1);
+            await expect(POST (`/emission/Buildings`, {})).rejects.toEqual(
+                new Error('405 - Entity "EmissionService.Buildings" is read-only')
+            );
+        });
+    });
+
+    describe ('Testing Methods', ()=> {
+        beforeAll(async ()=> {
+            await testData.delete();
+            setupEmissions();
+            setupMethods();
+        });   
+        test (`insertNewBuilding`, async ()=> {
+            const srv = await cds.connect.to('EmissionService');
+            expect.assertions(1);
+            await expect(await srv.insertNewBuilding([
+                {emission_name : 'heating', emission_level : 1, multiplicator : 100}
+            ])).toEqual(
+                expect.any(String)
+            );
+        });
+
+        test ('getBuildingEmission', async ()=> {
+            const srv = await cds.connect.to('EmissionService');
+            expect.assertions(1);
+            await expect(await srv.getBuildingEmission('Buildings', '9bd879d6-8ccd-4926-bac2-fc1af8dcaead')).toEqual(
+                expect.arrayContaining([
+                    {
+                        "ID": "9bd879d6-8ccd-4926-bac2-fc1af8dcaead",
+                        "totalEmission": 328.32000000000005,
+                        "unit": "kg/y"
+                    }
+                ])
+            );
+        });
     });
 });
 
@@ -73,12 +114,16 @@ describe('CDS Testing', ()=> {
 //         expect(service.testfunction(1)).toBe(1);
 //     });
 // });
-
+async function setupMethods() {
+    createEntries([
+        {ID : '9bd879d6-8ccd-4926-bac2-fc1af8dcaead', emissions : [
+            {emission_name : "heating", emission_level : 1, multiplicator : 60}
+        ]}
+    ], 'Building');
+}
 
 async function setupEmissions() {
-    const db = await cds.connect.to('db');
-    const {Emission} = db.model.entities('my.carbemissioncalc');
-    await db.create(Emission).entries([
+    createEntries([
         {name : "heating", level : 1, description : "Wood Pellets", value : 5.472, unit : "kg/sqm/y"},
         {name : "heating", level : 2, description : "Biogas", value : 23.104, unit : "kg/sqm/y"},
         {name : "heating", level : 3, description : "Natural Gas", value : 30.552, unit : "kg/sqm/y"},
@@ -88,17 +133,7 @@ async function setupEmissions() {
         {name : "hotwater", level : 2, description : "Electric", value : 897450, unit : "kg/y"},
         {name : "electricity", level : 1, description : "green", value : 40, unit : "kg/y"},
         {name : "electricity", level : 2, description : "standart", value : 612.3, unit : "kg/y"}
-    ]);
-}
-
-async function setupSingleBuilding() {
-    createEntries([
-        {emissions : [
-            {emission_name : "heating", emission_level : 1, multiplicator : 60},
-            {emission_name : "hotwater", emission_level : 1},
-            {emission_name : "electricity", emission_level : 2}
-        ]}
-    ]);
+    ], 'Emission');
 }
 
 async function setupBuildings() {
@@ -113,11 +148,20 @@ async function setupBuildings() {
             {emission_name : "hotwater", emission_level : 2},
             {emission_name : "electricity", emission_level : 1}
         ]}
-    ]);  
+    ], 'Building');  
 }
 
-async function createEntries(entries) {
+async function createEntries(entries, entity) {
     const db = await cds.connect.to('db');
-    const {Building} = db.model.entities('my.carbemissioncalc');
-    await db.create(Building).entries(entries);
+    const {Building, Emission} = db.model.entities('my.carbemissioncalc');
+    switch (entity) {
+        case 'Building':
+            await db.create(Building).entries(entries);       
+            break;
+        case 'Emission':
+            await db.create(Emission).entries(entries);
+            break;
+        default:
+            console.error(`${entity} is not a valid Enity`);;
+    }
 }
