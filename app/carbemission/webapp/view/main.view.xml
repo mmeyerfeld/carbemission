@@ -1,16 +1,74 @@
-<mvc:View
+<mvc:View 
+	xmlns:smartTable="sap.ui.comp.smarttable"
+	xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
     controllerName="carbemission.controller.main"
     xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
     displayBlock="true"
-    xmlns="sap.m"
->
-    <Shell id="shell">
-        <App id="app">
-            <pages>
-                <Page id="page" title="{i18n>title}">
-                    <content />
-                </Page>
-            </pages>
-        </App>
-    </Shell>
+    height="100%"
+    xmlns="sap.m">
+    <Page
+		showHeader="false"
+		class="sapUiContentPadding">
+		<Title 
+            text="Carbon Emission Calculator">
+        </Title>
+        <content>
+			<HBox justifyContent="SpaceAround">
+                <HBox>
+                    <Label text="Squaremeter" labelFor="sqmInput" />
+                    <Input
+                        id="sqmInput"
+                        class="sapUiSmallMarginBottom"
+                        type="Number"
+                        placeholder="House Squaremeters"
+                        valueStateText="Must be a Number" />
+                </HBox>
+                <Select
+                    id="heatingSelect"
+                    enabled="{/Enabled}"
+                    editable="{/Editable}"
+                    forceSelection="false"
+                    selectedKey="3"
+                    items="{
+                        path: 'neededData>/Heating',
+                        sorter: { path: 'Name' }
+                    }">
+                    <core:Item key="{neededData>ProductId}" text="{neededData>Name}" />
+                </Select>
+                <Select
+                        id="hotwaterSelect"
+						enabled="{/Enabled}"
+						editable="{/Editable}"
+						forceSelection="false"
+						selectedKey="1"
+						items="{
+							path: 'neededData>/Hotwater',
+							sorter: { path: 'Name' }
+						}">
+					<core:Item key="{neededData>ProductId}" text="{neededData>Name}" />
+				</Select>
+                <Select
+                        id="electricSelect"
+						enabled="{/Enabled}"
+						editable="{/Editable}"
+						forceSelection="false"
+						selectedKey="2"
+						items="{
+							path: 'neededData>/Electricity',
+							sorter: { path: 'Name' }
+						}">
+					<core:Item key="{neededData>ProductId}" text="{neededData>Name}" />
+				</Select>
+                <Button
+                    text="Submit"
+                    press="submitEvents">
+                </Button>
+			</HBox>
+            <Title
+                id="answerText"
+                text="Answer: ">
+            </Title>
+		</content>
+	</Page>
 </mvc:View>

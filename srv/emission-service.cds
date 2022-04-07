@@ -14,10 +14,10 @@ service EmissionService {
 
     entity Emissions as select from my.Building.emissions{
         up_,
-        emission.name,
-        emission.level,
+        emission.name as emission_name,
+        emission.level as emission_level,
         multiplicator
-    } actions {
-        action insertNewBuilding(emissions : array of Emissions) returns UUID;
     };
+    
+    action insertNewBuilding(emissions : array of Emissions) returns UUID;
 }
