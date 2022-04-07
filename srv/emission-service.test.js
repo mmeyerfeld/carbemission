@@ -95,6 +95,7 @@ describe('CDS Testing', ()=> {
         test ('getBuildingEmission', async ()=> {
             const srv = await cds.connect.to('EmissionService');
             expect.assertions(1);
+            const { data } = await GET `/emission/Buildings`;
             await expect(await srv.getBuildingEmission('Buildings', '9bd879d6-8ccd-4926-bac2-fc1af8dcaead')).toEqual(
                 expect.arrayContaining([
                     {

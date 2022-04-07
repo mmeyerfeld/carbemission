@@ -85,9 +85,12 @@ sap.ui.define([
                         
                         oModel.read(`/Buildings_getBuildingEmission`, {
                             method: 'GET',
-                            urlParameters: {ID : oData.insertNewBuilding},
+                            urlParameters: {
+                                ID : oData.insertNewBuilding,
+                                ID : oData.insertNewBuilding
+                            },
                             success: function(oData, response){
-                                answerText.setText(text + oData.totalEmission);
+                                answerText.setText(text + oData.totalEmission + "kg/y");
                             },
                             error: function(oError) {
                                 error.log(oError);

@@ -8,8 +8,8 @@ class EmissionService extends cds.ApplicationService {
             await db.create(Building, req.data);
             return req.data.ID;
         });
-        this.on ('getBuildingEmission', 'Buildings', async ({params:[id]})=> {
-            let building = await this.read(`Buildings`).where({ID : id});
+        this.on ('getBuildingEmission', 'Buildings', async ({params:[id],data})=> {
+            let building = await this.read(`Buildings`).where({ID : id || data.ID});
             return building;
         });
         await super.init();
