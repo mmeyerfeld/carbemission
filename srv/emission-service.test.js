@@ -139,7 +139,7 @@ describe ('Integration Testing', ()=> {
 // describe('Methode Testing', ()=>{
 //     beforeAll(()=>{});
 //     test('adds 1 + 2 to equal 3', () => {
-//         expect(service.testfunction(1)).toBe(1);
+//         expect(service.keks(1)).toBe(1);
 //     });
 // });
 async function setupMethods() {
