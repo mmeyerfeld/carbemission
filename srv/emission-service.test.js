@@ -1,4 +1,4 @@
-const service = require('./emission-service');
+// const service = require('./emission-service');
 const cds = require('@sap/cds-dk/lib');
 const { GET, POST, data } = cds.test(__dirname+'/..');
 const testData = data;
@@ -7,7 +7,7 @@ describe('CDS Testing', ()=> {
     beforeAll(async ()=> {
         await testData.delete();
     });
-
+    //Eigentlich nicht nötig, da ich hiermit die Test-API teste
     describe ('Tests without Data', ()=> {
         test ('Returning []', async ()=>{
             const { data } = await GET `/emission/Buildings`;
@@ -21,7 +21,8 @@ describe('CDS Testing', ()=> {
             setupEmissions();
             setupBuildings();
         });
-         
+        //Hier teste ich den Outupt vom Building Service => X
+        //X: totalEmission 
         test (`Testing totalEmission`, async ()=> {
             const { data } = await GET `/emission/Buildings`;
             expect(data.value).toEqual(
@@ -43,7 +44,7 @@ describe('CDS Testing', ()=> {
                 ])
             );
         });
-
+        //X: unit
         test (`Testing unit`, async ()=> {
             const { data } = await GET `/emission/Buildings`;
             expect(data.value).toEqual(
@@ -66,16 +67,17 @@ describe('CDS Testing', ()=> {
             );
         });
     });
-
+    //READONLY aktiviert, daher muss hier ein Fehler zurückkommen
     describe ('Testing POST', ()=> {
         test (`POST Buildings`, async ()=> {
             expect.assertions(1);
             await expect(POST (`/emission/Buildings`, {})).rejects.toEqual(
+                //Der Fehler sollte eigentlich mit RegEx überprüft werden
                 new Error('405 - Entity "EmissionService.Buildings" is read-only')
             );
         });
     });
-
+    //Testen der beiden MEthoden
     describe ('Testing Methods', ()=> {
         beforeAll(async ()=> {
             await testData.delete();
@@ -108,7 +110,7 @@ describe('CDS Testing', ()=> {
         });
     });
 });
-
+//Integration Test in der Form, in der die Methoden auch im Frontend aufgerufen werden
 describe ('Integration Testing', ()=> {
     beforeAll(async ()=> {
         await testData.delete();
